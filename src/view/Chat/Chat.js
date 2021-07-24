@@ -15,11 +15,25 @@ const Chat = props => {
     Conversation.get().then(res => {
       console.log(res);
     });
-    Conversation.find(11).then(con => {
-      con.onNewMessage(data => console.log('ahihi: ', data));
-      setConversation(con);
-    });
   }, []);
+
+  React.useEffect(() => {
+    if (!conversation.id) {
+      Conversation.find(11).then(con => {
+        console.log('doan hoi thoai dang xet: ', con);
+        setConversation(con);
+      });
+    }
+
+    if (conversation.id) {
+      conversation
+        .loadMessages()
+        .then(res => console.log('list tin nhan cua conversation: ', res));
+      conversation.onNewMessage(data =>
+        console.log('tui nhan duoc tin nhan rui: ', data),
+      );
+    }
+  }, [conversation]);
 
   const makeNewConversation = React.useCallback(() => {
     Conversation.create({
@@ -32,7 +46,7 @@ const Chat = props => {
   // const [newMsg, setNewMsg] = React.useState(false);
   const addNewCustomMessage = React.useCallback(() => {
     conversation
-      .addMessage({content: 'dm sao no ko console ra cai gi nhy?'})
+      .addMessage({content: 'lai test tiep ne'})
       .then(res => console.log('sau khi nhan tin: ', res));
   }, [conversation]);
 

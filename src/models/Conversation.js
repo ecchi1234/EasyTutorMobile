@@ -49,10 +49,7 @@ export default class Conversation extends Model {
       throw new Error('Invalid id');
     }
 
-    console.log('Day la echo ne ', Echo);
-
     Echo.private('conversation.' + this.id).listen('.new-message', event => {
-      console.log(event);
       this.messages.unshift(event.message);
       callback(event.message, this);
     });
