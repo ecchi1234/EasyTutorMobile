@@ -1,17 +1,13 @@
-// import LaravelEcho from 'laravel-echo';
 import LaravelEcho from 'laravel-echo';
-import Pusher from 'pusher-js/react-native';
-// import Pusher from 'pusher-js';
-
-// eslint-disable-next-line prettier/prettier
-// window.Pusher = require('pusher-js');
+import PusherClient from './PusherClient';
 
 const Echo = new LaravelEcho({
   broadcaster: 'pusher',
-  key: process.env.MIX_PUSHER_APP_KEY,
-  cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+  key: '4bdb9c8be680a0e453e3',
+  cluster: 'ap1',
   forceTLS: true,
-  client: Pusher,
+  client: PusherClient,
+  authEndpoint: '/broadcasting/auth',
 });
 
 export default Echo;

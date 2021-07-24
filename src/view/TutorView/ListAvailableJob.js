@@ -20,6 +20,8 @@ import {
   Avatar,
   Button,
 } from 'react-native-paper';
+
+import LottieView from 'lottie-react-native';
 import {colors} from '../../asset/color';
 import Post from '../../models/Post';
 
@@ -57,21 +59,52 @@ const ApplyButton = props => {
 
 const ListAvailableJob = props => {
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [posts, setPosts] = React.useState([]);
+  const [tmpPost, setTmpPost] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+
   React.useEffect(() => {
-    Post.get().then(res => console.log(res)); // res: mang, moi phan tu laf instance cua Post
-    // Post.create({
-    //   subjectId: 1,
-    //   description: 'Hoom nay nong vcl',
-    //   address: 'HN',
-    //   offer: 120,
-    // }).then(post => console.log(post));
-    Post.find(35).then(post => {
-      log.info(post);
-      // console.log(post);
-      // post.addApplicant({id: 2});
-      // post.setTutor({id: 1});
+    Post.get()
+      .then(res => {
+        setPosts(res);
+        setIsLoading(false);
+      })
+      .catch(err => console.log(err)); // res: mang, moi phan tu laf instance cua Post
+    Post.find(6).then(post => {
+      post.onNewApplicant(data => console.log('msg: ', data));
+      setTmpPost(post);
     });
+    // Post.find(5).then(post => {
+    //   setTmpPost(post);
+    // });
+    //   post.addApplicant({id: 22});
+    // });
   }, []);
+
+  // React.useEffect(() => {
+  //   if (!tmpPost) {
+  //     return;
+  //   }
+  //   console.log(tmpPost);
+  //   tmpPost.onNewApplicant(data => {
+  //     console.log(data);
+  //   });
+  // }, [tmpPost]);
+
+  const addApplicant = async () => {
+    console.log('them 1 applicant');
+    try {
+      tmpPost
+        .addApplicant({id: 22})
+        .then(data => {
+          console.log('sau khi add gia su: ', data);
+          // setTmpPost(data);
+        })
+        .catch(err => console.log(err));
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const onChangeSearch = query => setSearchQuery(query);
   return (
@@ -130,8 +163,144 @@ const ListAvailableJob = props => {
                 Yeu cau phu hop voi ban
               </Text>
             </View>
+            {!isLoading ? (
+              posts.map(post => {
+                return (
+                  <View style={{marginTop: 15}} key={post.id}>
+                    <Card style={{borderRadius: 12}}>
+                      <Card.Title
+                        title="Hourly - Posted 2 hours ago"
+                        subtitle="Day toan cho be"
+                        right={RightContent}
+                        titleStyle={{
+                          fontSize: 8,
+                          fontFamily: 'Montserrat-SemiBold',
+                          fontWeight: 'normal',
+                          color: colors.tab_color,
+                          padding: 0,
+                          lineHeight: 10,
+                          textAlignVertical: 'bottom',
+                        }}
+                        subtitleStyle={{
+                          fontSize: 13,
+                          fontFamily: 'Montserrat-SemiBold',
+                          fontWeight: 'normal',
+                          color: colors.primary_color,
+                        }}
+                      />
+                      <Card.Content>
+                        <View style={{flexDirection: 'row'}}>
+                          <View
+                            style={{
+                              backgroundColor: colors.background_color,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              padding: 8,
+                              borderRadius: 12,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                fontFamily: 'Montserrat-Bold',
+                                fontWeight: 'normal',
+                              }}>
+                              {post.subject.name}
+                            </Text>
+                          </View>
 
-            <View style={{marginTop: 15}}>
+                          <View
+                            style={{
+                              backgroundColor: colors.background_color,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              padding: 8,
+                              borderRadius: 10,
+                              marginHorizontal: 12,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                fontFamily: 'Montserrat-Bold',
+                                fontWeight: 'normal',
+                              }}>
+                              Ha Noi
+                            </Text>
+                          </View>
+
+                          <View
+                            style={{
+                              backgroundColor: colors.background_color,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              padding: 8,
+                              borderRadius: 12,
+                            }}>
+                            <Text
+                              style={{
+                                fontSize: 10,
+                                fontFamily: 'Montserrat-Bold',
+                                fontWeight: 'normal',
+                              }}>
+                              Offline
+                            </Text>
+                          </View>
+                        </View>
+                        <Paragraph
+                          style={{
+                            fontSize: 11,
+                            color: colors.secondary_information_text_color,
+                          }}>
+                          {post.description}
+                        </Paragraph>
+                        <TouchableOpacity>
+                          <View
+                            style={{
+                              backgroundColor: colors.backgroundColor,
+                              borderRadius: 5,
+                              padding: 5,
+                            }}>
+                            <Text
+                              style={{
+                                color: colors.darker_green_color,
+                                fontSize: 10,
+                              }}
+                              theme={{
+                                fonts: {
+                                  regular: {
+                                    fontFamily: 'Montserrat-Bold',
+                                    fontWeight: 'normal',
+                                  },
+                                },
+                              }}>
+                              More
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      </Card.Content>
+                      <Card.Cover source={{uri: 'https://picsum.photos/700'}} />
+                      <Card.Actions
+                        style={{padding: 10, justifyContent: 'flex-end'}}>
+                        <ApplyButton />
+                      </Card.Actions>
+                    </Card>
+                  </View>
+                );
+              })
+            ) : (
+              <LottieView
+                style={{
+                  width: 100,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                source={require('../../asset/loading-items.json')}
+                autoPlay
+                loop
+              />
+            )}
+
+            {/* <View style={{marginTop: 15}}>
               <Card style={{borderRadius: 12}}>
                 <Card.Title
                   title="Hourly - Posted 2 hours ago"
@@ -252,131 +421,14 @@ const ListAvailableJob = props => {
                   <ApplyButton />
                 </Card.Actions>
               </Card>
-            </View>
-
-            <View style={{marginTop: 15}}>
-              <Card style={{borderRadius: 12}}>
-                <Card.Title
-                  title="Hourly - Posted 2 hours ago"
-                  subtitle="Day toan cho be"
-                  right={RightContent}
-                  titleStyle={{
-                    fontSize: 8,
-                    fontFamily: 'Montserrat-SemiBold',
-                    fontWeight: 'normal',
-                    color: colors.tab_color,
-                    padding: 0,
-                    lineHeight: 10,
-                    textAlignVertical: 'bottom',
-                  }}
-                  subtitleStyle={{
-                    fontSize: 13,
-                    fontFamily: 'Montserrat-SemiBold',
-                    fontWeight: 'normal',
-                    color: colors.primary_color,
-                  }}
-                />
-                <Card.Content>
-                  <View style={{flexDirection: 'row'}}>
-                    <View
-                      style={{
-                        backgroundColor: colors.background_color,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: 8,
-                        borderRadius: 12,
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          fontFamily: 'Montserrat-Bold',
-                          fontWeight: 'normal',
-                        }}>
-                        Ha Noi
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        backgroundColor: colors.background_color,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: 8,
-                        borderRadius: 10,
-                        marginHorizontal: 12,
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          fontFamily: 'Montserrat-Bold',
-                          fontWeight: 'normal',
-                        }}>
-                        Ha Noi
-                      </Text>
-                    </View>
-
-                    <View
-                      style={{
-                        backgroundColor: colors.background_color,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        padding: 8,
-                        borderRadius: 12,
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          fontFamily: 'Montserrat-Bold',
-                          fontWeight: 'normal',
-                        }}>
-                        Offline
-                      </Text>
-                    </View>
-                  </View>
-                  <Paragraph
-                    style={{
-                      fontSize: 11,
-                      color: colors.secondary_information_text_color,
-                    }}>
-                    I am looking for a Co-Founder to join me visualize an idea
-                    to fruition. The Macro Idea is an Platform BYOB which stands
-                    for BeYourOwnBoss will be a social media to give a platform
-                    to entrepreneurs and investors and freelancers enhance the
-                    way they regularly network and to create for themselves and
-                    as our slogan says "Make it Real". I also have a ...
-                  </Paragraph>
-                  <TouchableOpacity>
-                    <View
-                      style={{
-                        backgroundColor: colors.backgroundColor,
-                        borderRadius: 5,
-                        padding: 5,
-                      }}>
-                      <Text
-                        style={{
-                          color: colors.darker_green_color,
-                          fontSize: 10,
-                        }}
-                        theme={{
-                          fonts: {
-                            regular: {
-                              fontFamily: 'Montserrat-Bold',
-                              fontWeight: 'normal',
-                            },
-                          },
-                        }}>
-                        More
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                </Card.Content>
-                <Card.Cover source={{uri: 'https://picsum.photos/700'}} />
-                <Card.Actions style={{padding: 10, justifyContent: 'flex-end'}}>
-                  <ApplyButton />
-                </Card.Actions>
-              </Card>
-            </View>
+            </View> */}
           </View>
+          <Button
+            onPress={() => {
+              addApplicant();
+            }}>
+            them gia su
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>

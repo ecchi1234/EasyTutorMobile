@@ -350,7 +350,7 @@ const Profile = props => {
                 <IconButton
                   icon={require('../asset/edit-button.png')}
                   size={23}
-                  onPress={() => console.log('Pressed')}
+                  onPress={() => props.navigation.navigate('AddComment')}
                   color={'#fff'}
                   animated={true}
                   style={{backgroundColor: colors.primary_color}}

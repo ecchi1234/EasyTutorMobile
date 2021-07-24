@@ -9,7 +9,29 @@ import {colors} from '../../asset/color';
 
 import Auth from '../../models/Auth';
 
+import Conversation from '../../models/Conversation';
+
 const ListMessage = props => {
+  const currentConversation = React.useMemo(() => new Conversation(), []);
+  currentConversation.id = 11;
+  const [listMessages, setListMessages] = React.useState([]);
+  const [isLoad, setIsLoad] = React.useState(true);
+  React.useEffect(() => {
+    if (isLoad) {
+      console.log('lan 1: ', listMessages);
+      currentConversation.loadMessages().then(res => {
+        console.log('lan 2: ', listMessages);
+        if (listMessages.length === 0) {
+          setListMessages(res.reverse());
+        }
+      });
+
+      setIsLoad(false);
+    }
+  }, [currentConversation, isLoad, listMessages]);
+
+  const [ourMessage, setOurMessage] = React.useState('');
+
   return (
     <>
       <View
@@ -24,7 +46,7 @@ const ListMessage = props => {
           <IconButton
             icon={require('../../asset/white-back-button.png')}
             color={'#fff'}
-            onPress={() => console.log('Pressed')}
+            onPress={() => props.navigation.navigate('Chat')}
             size={20}
           />
         </View>
@@ -67,6 +89,7 @@ const ListMessage = props => {
                 padding: 10,
                 maxWidth: '70%',
                 minWidth: '10%',
+                elevation: 5,
               }}>
               <Text>
                 Hellofffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -93,6 +116,53 @@ const ListMessage = props => {
               </Text>
             </View>
           </View>
+          {console.log('listMessage thuc su ', listMessages)}
+          {listMessages.map((item, index) => {
+            if (item.userId === Auth.currentUser.id) {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-end',
+                    marginBottom: 20,
+                  }}>
+                  <View
+                    style={{
+                      backgroundColor: colors.primary_color,
+                      borderRadius: 10,
+                      padding: 10,
+                      maxWidth: '70%',
+                      minWidth: '10%',
+                    }}>
+                    <Text style={{color: '#fff'}}>{item.content}</Text>
+                  </View>
+                </View>
+              );
+            } else {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'flex-start',
+                    marginBottom: 20,
+                  }}>
+                  <View
+                    style={{
+                      backgroundColor: '#fff',
+                      borderRadius: 10,
+                      padding: 10,
+                      maxWidth: '70%',
+                      minWidth: '10%',
+                      elevation: 5,
+                    }}>
+                    <Text>{item.content}</Text>
+                  </View>
+                </View>
+              );
+            }
+          })}
         </View>
       </ScrollView>
       <View
@@ -106,6 +176,7 @@ const ListMessage = props => {
 
         <View>
           <TextInput
+            value={ourMessage}
             placeholder={'Chat something...'}
             style={{
               height: 50,
@@ -121,10 +192,19 @@ const ListMessage = props => {
             right={
               <TextInput.Icon
                 icon={require('../../asset/send.png')}
-                onPress={() => console.log('ahihi')}
+                onPress={() => {
+                  setOurMessage('');
+                  currentConversation
+                    .addMessage({content: ourMessage})
+                    .then(res => {
+                      console.log(res);
+                      setIsLoad(true);
+                    });
+                }}
                 color={colors.primary_color}
               />
             }
+            onChangeText={value => setOurMessage(value)}
           />
         </View>
       </View>

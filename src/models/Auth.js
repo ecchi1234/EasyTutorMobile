@@ -3,6 +3,7 @@ import Echo from './Echo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import config from './config';
+import PusherClient from './PusherClient';
 
 export default class Auth {
   static currentUser = null;
@@ -15,6 +16,7 @@ export default class Auth {
    * @returns {Object}
    */
   static async login(loginData) {
+    console.log(loginData);
     let {data} = await axios.post(
       config.hostName + '/api/auth/login',
       loginData,
@@ -24,7 +26,7 @@ export default class Auth {
   }
 
   static async autoLogin() {
-    let token = AsyncStorage.getItem('token');
+    let token = await AsyncStorage.getItem('token');
     if (!token) {
       return;
     }
@@ -42,6 +44,8 @@ export default class Auth {
   }
 
   static async register(registerData) {
+    console.log(registerData);
+    console.log(config.hostName);
     let {data} = await axios.post(
       config.hostName + '/api/auth/register',
       registerData,
@@ -58,7 +62,9 @@ export default class Auth {
     Auth.token = token;
 
     AsyncStorage.setItem('token', token);
-    axios.defaults.headers.common['Authorization'] = token;
+    axios.defaults.headers.common.Authorization = token;
+    // console.log(PusherClient.config);
+    PusherClient.config.auth.headers['Authorization'] = token;
     Echo.connector.options.auth.headers['Authorization'] = token;
 
     Auth.handleStateChanged();

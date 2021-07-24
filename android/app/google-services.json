@@ -1,0 +1,97 @@
+{
+  "project_info": {
+    "project_number": "800799404920",
+    "project_id": "easy-tutor-project",
+    "storage_bucket": "easy-tutor-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800799404920:android:b36dd193dd05a6492b0e8d",
+        "android_client_info": {
+          "package_name": "com.company.easy_tutor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6IjVge53qayH2dS8tdSw-lBMsU94mnNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800799404920:android:61e28386a06cc0f22b0e8d",
+        "android_client_info": {
+          "package_name": "com.easytutortest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6IjVge53qayH2dS8tdSw-lBMsU94mnNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800799404920:android:beaafdc359af56052b0e8d",
+        "android_client_info": {
+          "package_name": "com.test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6IjVge53qayH2dS8tdSw-lBMsU94mnNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800799404920-21k9fb3u6htkor3h2mk5u767hpg2v90p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

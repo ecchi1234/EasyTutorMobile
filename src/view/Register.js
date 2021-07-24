@@ -1,11 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {View, SCrollVIew, ScrollView} from 'react-native';
+import {View, ScrollView} from 'react-native';
 
 import {Button, TextInput, RadioButton, Text, Title} from 'react-native-paper';
 import {colors} from '../asset/color';
-import {AuthContext} from '../authContext';
+// import {AuthContext} from '../authContext';
+import Auth from '../models/Auth';
 
 const Register = props => {
   const [signUpInformation, setSignUpInformation] = React.useState({
@@ -17,7 +18,10 @@ const Register = props => {
     isTutor: true,
   });
 
-  const {signUp} = React.useContext(AuthContext);
+  // const {signUp} = React.useContext(AuthContext);
+  const signUp = input => {
+    Auth.register(input);
+  };
 
   return (
     <>

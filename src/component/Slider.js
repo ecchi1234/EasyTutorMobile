@@ -43,7 +43,7 @@ const Slider = () => {
         showsHorizontalScrollIndicator={false}
         style={style.scroll}>
         {images.map((image, index) => {
-          return <Image source={image} key={index} style={style.image} />;
+          return <Image key={index} source={image} style={style.image} />;
         })}
       </ScrollView>
       <View style={style.pagination}>
@@ -60,14 +60,26 @@ const Slider = () => {
 };
 
 const style = StyleSheet.create({
-  container: {marginTop: 30, width, height},
-  scroll: {width, height},
-  image: {width, height, resizeMode: 'cover'},
+  container: {
+    marginTop: 30,
+    width: width - 30,
+    height: height,
+    padding: 15,
+  },
+  scroll: {width: width - 30, height: height, borderRadius: 20},
+  image: {
+    width: width - 30,
+    height: height,
+    resizeMode: 'cover',
+    borderRadius: 20,
+  },
   pagination: {
     flexDirection: 'row',
     position: 'absolute',
     bottom: 0,
     alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pagingText: {color: '#888', margin: 3},
   pagingActiveText: {color: '#fff', margin: 3},

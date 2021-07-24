@@ -16,7 +16,7 @@ const CreatePost = () => {
   //   {label: 'Banana', value: 'banana'},
   // ]);
   const [postInformation, setPostInformation] = useState({
-    subjectId: 0,
+    subjectId: 1,
     description: '',
     address: '',
     offer: 0,

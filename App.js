@@ -35,11 +35,67 @@ import ListMessage from './src/view/Chat/ListMessage';
 import Home from './src/view/Home';
 import CreatePost from './src/view/LearnerView/CreatePost';
 import ListTutor from './src/view/LearnerView/ListTutor';
+import AddComment from './src/view/LearnerView/AddComment';
 import {colors} from './src/asset/color';
 
 import {AuthContext} from './src/authContext';
 import fontConfig from './src/config/font';
 import Auth from './src/models/Auth';
+import LoadingView from './src/view/LoadingView';
+
+// Import module
+import RNPusherPushNotifications from 'react-native-pusher-push-notifications';
+
+// Get your interest
+const donutsInterest = 'debug-donuts';
+
+// Initialize notifications
+export const init = () => {
+  // Set your app key and register for push
+  RNPusherPushNotifications.setInstanceId(
+    'a07077c0-7d74-4964-94a5-513f7270c511',
+  );
+
+  // Init interests after registration
+  RNPusherPushNotifications.on('registered', () => {
+    subscribe(donutsInterest);
+  });
+
+  // Setup notification listeners
+  RNPusherPushNotifications.on('notification', handleNotification);
+};
+
+// Handle notifications received
+const handleNotification = notification => {
+  console.log(notification);
+};
+
+// Subscribe to an interest
+const subscribe = interest => {
+  // Note that only Android devices will respond to success/error callbacks
+  RNPusherPushNotifications.subscribe(
+    interest,
+    (statusCode, response) => {
+      console.error(statusCode, response);
+    },
+    () => {
+      console.log('Success');
+    },
+  );
+};
+
+// Unsubscribe from an interest
+const unsubscribe = interest => {
+  RNPusherPushNotifications.unsubscribe(
+    interest,
+    (statusCode, response) => {
+      console.tron.logImportant(statusCode, response);
+    },
+    () => {
+      console.tron.logImportant('Success');
+    },
+  );
+};
 
 const theme = {
   ...DefaultTheme,
@@ -54,13 +110,16 @@ const theme = {
 export default function App(props) {
   // state for sign-in/register/sign-out
 
+  React.useEffect(() => {
+    init();
+  }, []);
+
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
       switch (action.type) {
         case 'RESTORE_TOKEN':
           return {
             ...prevState,
-            userToken: action.token,
             isLoading: false,
           };
         case 'SIGN_IN':
@@ -91,32 +150,18 @@ export default function App(props) {
     },
   );
 
-  React.useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
-      let userToken;
-
-      try {
-        userToken = await AsyncStorage.getItem('token');
-        // userToken = await AsyncStorage.getItem('userToken');
-      } catch (e) {
-        // Restoring token failed
-      }
-
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      dispatch({type: 'RESTORE_TOKEN', token: userToken});
-    };
-
-    bootstrapAsync();
-  }, []);
-
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   React.useEffect(() => {
+    Auth.autoLogin().then(() => {
+      dispatch({type: 'RESTORE_TOKEN'});
+    });
+  }, []);
+  React.useEffect(() => {
     // user = null ,+> logout,
-    Auth.onStateChanged(user => setIsLoggedIn(user !== null));
+
+    Auth.onStateChanged(user => {
+      setIsLoggedIn(user !== null);
+    });
   }, []);
 
   const authContext = React.useMemo(
@@ -162,20 +207,6 @@ export default function App(props) {
     [],
   );
 
-  // const [loaded] = useFonts({
-  //   MontserratLight: require('./src/asset/fonts/Montserrat-Light.ttf'),
-  //   MontserratRegular: require('./src/asset/fonts/Montserrat-Regular.ttf'),
-  //   MontserratMedium: require('./src/asset/fonts/Montserrat-Medium.ttf'),
-  //   MontserratSemiBold: require('./src/asset/fonts/Montserrat-SemiBold.ttf'),
-  //   MontserratBold: require('./src/asset/fonts/Montserrat-Bold.ttf'),
-  //   MontserratBlack: require('./src/asset/fonts/Montserrat-Black.ttf'),
-  //   Montserrat: require('./src/asset/fonts/Montserrat-Medium.ttf'),
-  // });
-
-  // if (!loaded) {
-  //   return <Splash />;
-  // }
-
   if (state.isLoading) {
     // We haven't finished checking for the token yet
     return <Splash />;
@@ -184,6 +215,77 @@ export default function App(props) {
   const Stack = createStackNavigator();
   const Tab = createBottomTabNavigator();
   const Drawer = createDrawerNavigator();
+  const ChatStack = createStackNavigator();
+  const ProfileStack = createStackNavigator();
+  const HomeStack = createStackNavigator();
+
+  const ChatStackScreen = () => (
+    <ChatStack.Navigator>
+      <ChatStack.Screen
+        name="Chat"
+        component={Chat}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <ChatStack.Screen
+        name="ListMessage"
+        component={ListMessage}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </ChatStack.Navigator>
+  );
+
+  const ProfileStackScreen = () => {
+    return (
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <ProfileStack.Screen
+          name="AddComment"
+          component={AddComment}
+          options={{
+            headerShown: false,
+          }}
+        />
+      </ProfileStack.Navigator>
+    );
+  };
+
+  const HomeStackScreen = () => {
+    return (
+      <HomeStack.Navigator>
+        <HomeStack.Screen
+          name="Home"
+          component={Home}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <HomeStack.Screen
+          name="ListAvailableJob"
+          component={ListAvailableJob}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <HomeStack.Screen
+          name="CreatePost"
+          component={CreatePost}
+          options={{
+            headerShown: false,
+          }}
+        />
+      </HomeStack.Navigator>
+    );
+  };
 
   return (
     <AuthContext.Provider value={authContext}>
@@ -280,11 +382,11 @@ export default function App(props) {
                   fontFamily: 'Montserrat-Medium',
                 },
               }}>
-              <Tab.Screen name="Job" component={Home} />
-              <Tab.Screen name="Chat" component={Chat} />
+              <Tab.Screen name="Job" component={HomeStackScreen} />
+              <Tab.Screen name="Chat" component={ChatStackScreen} />
               <Tab.Screen name="Notification" component={CreatePost} />
-              <Tab.Screen name="Profile" component={Profile} />
-              <Tab.Screen name="Proposals" component={ListTutor} />
+              <Tab.Screen name="Profile" component={ProfileStackScreen} />
+              <Tab.Screen name="Proposals" component={LoadingView} />
               {/* <Tab.Screen name="Notifications" component={Splash} /> */}
             </Tab.Navigator>
           </NavigationContainer>
