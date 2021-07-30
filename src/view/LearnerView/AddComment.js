@@ -11,6 +11,7 @@ import {Text, Avatar, Button} from 'react-native-paper';
 import {colors} from '../../asset/color';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Rating, AirbnbRating} from 'react-native-ratings';
+import Rate from '../../models/Rate';
 
 const HideKeyboard = ({children}) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -19,7 +20,19 @@ const HideKeyboard = ({children}) => (
 );
 
 const AddComment = props => {
-  const [comment, setComment] = React.useState('');
+  const [rateForTutor, setRateForTutor] = React.useState({
+    star: 0,
+    comment: '',
+  });
+  const handleRateTutor = React.useCallback(() => {
+    Rate.forTutor({id: 101})
+      .makeEvaluate(rateForTutor)
+      .then(rate => {
+        console.log(rate);
+      })
+      .catch(err => console.log(err.response.data));
+  }, [rateForTutor]);
+
   return (
     <HideKeyboard>
       <View
@@ -63,7 +76,10 @@ const AddComment = props => {
             ]}
             defaultRating={5}
             size={25}
-            onFinishRating={rating => console.log('Rating is: ' + rating)}
+            onFinishRating={rating => {
+              console.log('Rating is: ', rating);
+              setRateForTutor({...rateForTutor, star: rating});
+            }}
           />
         </View>
 
@@ -73,8 +89,10 @@ const AddComment = props => {
           textAlignVertical={'top'}
           multiline={true}
           placeholder={'Danh gia cua ban ...'}
-          onChangeText={value => setComment(value)}
-          value={comment}
+          onChangeText={value =>
+            setRateForTutor({...rateForTutor, comment: value})
+          }
+          value={rateForTutor?.comment}
           style={{
             marginTop: 20,
             height: 200,
@@ -93,7 +111,7 @@ const AddComment = props => {
           <Button
             style={{width: '100%'}}
             mode="contained"
-            onPress={() => console.log('add comment')}
+            onPress={handleRateTutor}
             //   style={{padding: 5}}
             labelStyle={{color: '#fff'}}
             contentStyle={{padding: 5}}>

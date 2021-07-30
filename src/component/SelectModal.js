@@ -3,7 +3,7 @@ import React from 'react';
 
 import {View, ScrollView} from 'react-native';
 
-import {Text, Portal, Modal, List, RadioButton} from 'react-native-paper';
+import {Text, Portal, Modal, RadioButton, Checkbox} from 'react-native-paper';
 
 import {colors} from '../asset/color';
 
@@ -20,13 +20,22 @@ const SelectModal = props => {
     height: '40%',
     margin: 20,
   };
-  const [checked, setChecked] = React.useState('first');
+  // const [checked, setChecked] = React.useState('first');
   return (
     <Portal>
       <Modal
         visible={props.visible}
         onDismiss={props.hideModal}
         contentContainerStyle={containerStyle}>
+        <Text
+          style={{
+            marginBottom: 20,
+            fontSize: 15,
+            fontFamily: 'Montserrat-Bold',
+            fontWeight: 'normal',
+          }}>
+          {props?.title}
+        </Text>
         <ScrollView>
           {props.listItem &&
             props.listItem.map((item, index) => (
@@ -39,13 +48,24 @@ const SelectModal = props => {
                   marginBottom: 10,
                 }}>
                 <View>
-                  <Text>{item}</Text>
+                  <Text>{item.name}</Text>
                 </View>
 
                 <RadioButton
-                  value="first"
-                  status={checked === 'first' ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked('first')}
+                  value={item.id}
+                  status={
+                    props?.model[props.idField] === item?.id
+                      ? 'checked'
+                      : 'unchecked'
+                  }
+                  onPress={() => {
+                    console.log(props.idField);
+                    props.setModel({
+                      ...props?.model,
+                      [props.idField]: item?.id,
+                      [props.nameField]: item?.name,
+                    });
+                  }}
                   color={colors.primary_color}
                 />
               </View>

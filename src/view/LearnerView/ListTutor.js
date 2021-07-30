@@ -14,7 +14,17 @@ import {
 
 import {colors} from '../../asset/color';
 
+import Post from '../../models/Post';
+import User from '../../models/User';
 const ListTutor = () => {
+  const handleAcceptTutor = React.useCallback(() => {
+    Post.find(17)
+      .then(post => {
+        return post.setTutor(post.applicants[0]);
+      })
+      .then(res => console.log(res))
+      .catch(err => console.log(err.response.data));
+  }, []);
   return (
     <View
       style={{
@@ -127,7 +137,7 @@ const ListTutor = () => {
 
                 <View>
                   <Button
-                    onPress={() => console.log('select')}
+                    onPress={handleAcceptTutor}
                     icon="check-bold"
                     mode={'contained'}
                     labelStyle={{

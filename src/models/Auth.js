@@ -32,14 +32,15 @@ export default class Auth {
     }
 
     try {
-      let {data} = await axios.get(config.hostName + '/api/user/info', {
+      let {data} = await axios.get(config.hostName + '/api/user/profile', {
         headers: {
           Authorization: token,
         },
       });
+
       Auth.saveState(data.user, token);
     } catch (error) {
-      console.log(error);
+      console.log(error.response.data);
     }
   }
 

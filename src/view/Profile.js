@@ -18,9 +18,24 @@ import {colors} from '../asset/color';
 
 import {AuthContext} from '../authContext';
 import Auth from '../models/Auth';
+import Rate from '../models/Rate';
+import StarRating from '../component/StarRating';
 
 const Profile = props => {
-  const {signOut} = React.useContext(AuthContext);
+  // const {signOut} = React.useContext(AuthContext);
+  const [listRatings, setListRatings] = React.useState([]);
+  const [avgRating, setAvgRating] = React.useState();
+  React.useEffect(() => {
+    Rate.forTutor({id: 101})
+      .get()
+      .then(rates => {
+        setListRatings(rates);
+        setAvgRating(rates.avg);
+        console.log(rates.avg);
+        // rates.avg: điểm trung bình
+        // rates.total: bao nhiêu thằng rate
+      });
+  }, []);
   const generalInformation = React.useMemo(() => {
     return (
       <>
@@ -199,62 +214,67 @@ const Profile = props => {
                       },
                     },
                   }}>
-                  Nhan xet
+                  Nhận xét
                 </Text>
-                <Text style={{fontSize: 12}}>1 binh luan</Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                  }}>{`${listRatings.length} bình luận`}</Text>
               </View>
               <View style={[styles.informationUnderline]} />
             </View>
-
-            <View style={{flexDirection: 'row'}}>
-              <View style={{}}>
-                <Avatar.Image
-                  source={require('../asset/review-avatar.png')}
-                  size={35}
-                />
-              </View>
-
-              <View
-                style={{
-                  marginLeft: 7,
-                  width: '86%',
-                }}>
+            {listRatings.map((rating, index) => {
+              return (
                 <View
                   style={{
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={{fontSize: 11}}
-                    theme={{
-                      fonts: {
-                        regular: {
-                          fontFamily: 'Montserrat-Bold',
-                          fontWeight: 'normal',
-                        },
-                      },
+                    marginBottom: 10,
+                  }}
+                  key={index}>
+                  <View style={{}}>
+                    <Avatar.Image
+                      source={require('../asset/review-avatar.png')}
+                      size={35}
+                    />
+                  </View>
+
+                  <View
+                    style={{
+                      marginLeft: 7,
+                      width: '86%',
                     }}>
-                    Tran Thi B
-                  </Text>
-                  <View style={{flexDirection: 'row'}}>
-                    <Icon name="star" size={15} color={colors.yellow_color} />
-                    <Icon name="star" size={15} color={colors.yellow_color} />
-                    <Icon name="star" size={15} color={colors.yellow_color} />
-                    <Icon name="star" size={15} color={colors.yellow_color} />
-                    <Icon name="star" size={15} color={colors.yellow_color} />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}>
+                      <Text
+                        style={{fontSize: 11}}
+                        theme={{
+                          fonts: {
+                            regular: {
+                              fontFamily: 'Montserrat-Bold',
+                              fontWeight: 'normal',
+                            },
+                          },
+                        }}>
+                        Tran Thi B
+                      </Text>
+                      <StarRating star={rating.star} />
+                    </View>
+                    <View>
+                      <Text style={{fontSize: 11}}>{rating?.comment}</Text>
+                    </View>
                   </View>
                 </View>
-                <View>
-                  <Text style={{fontSize: 11}}>Day rat hay!</Text>
-                </View>
-              </View>
-            </View>
+              );
+            })}
           </View>
         </View>
       </>
     );
-  }, []);
+  }, [listRatings]);
 
   const profileTabReducer = (state, action) => {
     switch (action.type) {
@@ -378,7 +398,7 @@ const Profile = props => {
                     },
                   },
                 }}>
-                4.5/5
+                {`${avgRating ? Number(avgRating).toFixed(1) : '0.0'}/5`}
               </Text>
               <Text
                 style={{fontSize: 9, color: colors.tab_color}}

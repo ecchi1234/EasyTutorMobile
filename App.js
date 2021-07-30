@@ -14,7 +14,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet, LogBox} from 'react-native';
 import {
   DefaultTheme,
   Provider as PaperProvider,
@@ -36,9 +36,13 @@ import Home from './src/view/Home';
 import CreatePost from './src/view/LearnerView/CreatePost';
 import ListTutor from './src/view/LearnerView/ListTutor';
 import AddComment from './src/view/LearnerView/AddComment';
+import Notification from './src/view/Notification';
+import GeneralProfile from './src/view/GeneralProfile';
+import UpdateTutorProfile from './src/view/UpdateTutorProfile';
 import {colors} from './src/asset/color';
 
 import {AuthContext} from './src/authContext';
+import {NotificationContext} from './src/notificationContext';
 import fontConfig from './src/config/font';
 import Auth from './src/models/Auth';
 import LoadingView from './src/view/LoadingView';
@@ -46,11 +50,8 @@ import LoadingView from './src/view/LoadingView';
 // Import module
 import RNPusherPushNotifications from 'react-native-pusher-push-notifications';
 
-// Get your interest
-const donutsInterest = 'debug-donuts';
-
 // Initialize notifications
-export const init = () => {
+export const init = user => {
   // Set your app key and register for push
   RNPusherPushNotifications.setInstanceId(
     'a07077c0-7d74-4964-94a5-513f7270c511',
@@ -58,7 +59,9 @@ export const init = () => {
 
   // Init interests after registration
   RNPusherPushNotifications.on('registered', () => {
-    subscribe(donutsInterest);
+    subscribe(`donut-${user.id}`);
+    console.log('dang ky thiet bi');
+    console.log('device: ', `donut-${user.id}`);
   });
 
   // Setup notification listeners
@@ -106,13 +109,11 @@ const theme = {
     primary: colors.primary_color,
   },
 };
+// ignore clumsy warning
+LogBox.ignoreLogs(['Setting a timer', 'If you']);
 
 export default function App(props) {
   // state for sign-in/register/sign-out
-
-  React.useEffect(() => {
-    init();
-  }, []);
 
   const [state, dispatch] = React.useReducer(
     (prevState, action) => {
@@ -152,14 +153,20 @@ export default function App(props) {
 
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   React.useEffect(() => {
-    Auth.autoLogin().then(() => {
-      dispatch({type: 'RESTORE_TOKEN'});
-    });
+    Auth.autoLogin()
+      .then(() => {
+        dispatch({type: 'RESTORE_TOKEN'});
+      })
+      .catch(err => console.log(err.response.data));
   }, []);
   React.useEffect(() => {
     // user = null ,+> logout,
 
     Auth.onStateChanged(user => {
+      if (user !== null) {
+        init(user);
+      }
+
       setIsLoggedIn(user !== null);
     });
   }, []);
@@ -218,6 +225,46 @@ export default function App(props) {
   const ChatStack = createStackNavigator();
   const ProfileStack = createStackNavigator();
   const HomeStack = createStackNavigator();
+  const PostStack = createStackNavigator();
+  const GeneralProfileStack = createStackNavigator();
+
+  const GeneralProfileStackScreen = () => (
+    <GeneralProfileStack.Navigator>
+      <GeneralProfileStack.Screen
+        name="GeneralProfile"
+        component={GeneralProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <GeneralProfileStack.Screen
+        name="UpdateTutorProfile"
+        component={UpdateTutorProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </GeneralProfileStack.Navigator>
+  );
+
+  const PostStackScreen = () => (
+    <PostStack.Navigator>
+      <PostStack.Screen
+        name="ListAvailableJob"
+        component={ListAvailableJob}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PostStack.Screen
+        name="PostFilter"
+        component={PostFilter}
+        options={{
+          headerShown: false,
+        }}
+      />
+    </PostStack.Navigator>
+  );
 
   const ChatStackScreen = () => (
     <ChatStack.Navigator>
@@ -271,7 +318,7 @@ export default function App(props) {
         />
         <HomeStack.Screen
           name="ListAvailableJob"
-          component={ListAvailableJob}
+          component={PostStackScreen}
           options={{
             headerShown: false,
           }}
@@ -289,114 +336,119 @@ export default function App(props) {
 
   return (
     <AuthContext.Provider value={authContext}>
-      <PaperProvider theme={theme}>
-        {!isLoggedIn ? (
-          <NavigationContainer>
-            <Stack.Navigator>
-              <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{headerShown: false}}
-              />
-              <Stack.Screen
-                name="Register"
-                component={Register}
-                options={{headerShown: false}}
-              />
-            </Stack.Navigator>
-          </NavigationContainer>
-        ) : (
-          <NavigationContainer>
-            <Tab.Navigator
-              screenOptions={({route}) => ({
-                tabBarIcon: ({focused, color, size}) => {
-                  let iconName;
+      <NotificationContext.Provider value={authContext}>
+        <PaperProvider theme={theme}>
+          {!isLoggedIn ? (
+            <NavigationContainer>
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Login"
+                  component={Login}
+                  options={{headerShown: false}}
+                />
+                <Stack.Screen
+                  name="Register"
+                  component={Register}
+                  options={{headerShown: false}}
+                />
+              </Stack.Navigator>
+            </NavigationContainer>
+          ) : (
+            <NavigationContainer>
+              <Tab.Navigator
+                screenOptions={({route}) => ({
+                  tabBarIcon: ({focused, color, size}) => {
+                    let iconName;
 
-                  switch (route.name) {
-                    case 'Job': {
-                      iconName = focused
-                        ? require('./src/asset/job-focused.png')
-                        : require('./src/asset/job-not-focused.png');
-                      break;
+                    switch (route.name) {
+                      case 'Home': {
+                        iconName = focused
+                          ? require('./src/asset/home-focused.png')
+                          : require('./src/asset/home-not-focused.png');
+                        break;
+                      }
+                      case 'Chat': {
+                        iconName = focused
+                          ? require('./src/asset/chat-focused.png')
+                          : require('./src/asset/chat-not-focused.png');
+                        break;
+                      }
+                      case 'Notification': {
+                        iconName = focused
+                          ? require('./src/asset/notification-focused.png')
+                          : require('./src/asset/notification-not-focused.png');
+                        break;
+                      }
+                      case 'Profile': {
+                        iconName = focused
+                          ? require('./src/asset/profile-focused.png')
+                          : require('./src/asset/profile-not-focused.png');
+                        break;
+                      }
+                      case 'Proposals': {
+                        iconName = focused
+                          ? require('./src/asset/proposals-focused.png')
+                          : require('./src/asset/proposals-not-focused.png');
+                        break;
+                      }
                     }
-                    case 'Chat': {
-                      iconName = focused
-                        ? require('./src/asset/chat-focused.png')
-                        : require('./src/asset/chat-not-focused.png');
-                      break;
-                    }
-                    case 'Notification': {
-                      iconName = focused
-                        ? require('./src/asset/notification-focused.png')
-                        : require('./src/asset/notification-not-focused.png');
-                      break;
-                    }
-                    case 'Profile': {
-                      iconName = focused
-                        ? require('./src/asset/profile-focused.png')
-                        : require('./src/asset/profile-not-focused.png');
-                      break;
-                    }
-                    case 'Proposals': {
-                      iconName = focused
-                        ? require('./src/asset/proposals-focused.png')
-                        : require('./src/asset/proposals-not-focused.png');
-                      break;
-                    }
-                  }
 
-                  // You can return any component that you like here!
+                    // You can return any component that you like here!
 
-                  return (
-                    <View
-                      // eslint-disable-next-line react-native/no-inline-styles
-                      style={{
-                        borderRadius: 5,
-                        padding: 5,
-                        backgroundColor: focused
-                          ? '#F1F9ED'
-                          : colors.background_color,
-                        width:
-                          (size * Image.resolveAssetSource(iconName).width) /
-                          Image.resolveAssetSource(iconName).height,
-                        height: size,
-                      }}>
-                      <Image
-                        source={iconName}
+                    return (
+                      <View
                         // eslint-disable-next-line react-native/no-inline-styles
                         style={{
-                          width: '100%',
-                          height: '100%',
-                        }}
-                      />
-                    </View>
-                  );
-                },
-              })}
-              tabBarOptions={{
-                activeTintColor: colors.primary_information_text_color,
-                inactiveTintColor: colors.tab_color,
-                // activeBackgroundColor: '#F1F9ED',
-                // inactiveBackgroundColor: colors.background_color,
-                labelStyle: {
-                  fontFamily: 'Montserrat-Medium',
-                },
-              }}>
-              <Tab.Screen name="Job" component={HomeStackScreen} />
-              <Tab.Screen name="Chat" component={ChatStackScreen} />
-              <Tab.Screen name="Notification" component={CreatePost} />
-              <Tab.Screen name="Profile" component={ProfileStackScreen} />
-              <Tab.Screen name="Proposals" component={LoadingView} />
-              {/* <Tab.Screen name="Notifications" component={Splash} /> */}
-            </Tab.Navigator>
-          </NavigationContainer>
-          // <View
-          //   style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          // >
-          //   <Button onPress={() => authContext.signOut()}>Sign out</Button>
-          // </View>
-        )}
-      </PaperProvider>
+                          borderRadius: 5,
+                          padding: 5,
+                          backgroundColor: focused
+                            ? '#F1F9ED'
+                            : colors.background_color,
+                          width:
+                            (size * Image.resolveAssetSource(iconName).width) /
+                            Image.resolveAssetSource(iconName).height,
+                          height: size,
+                        }}>
+                        <Image
+                          source={iconName}
+                          // eslint-disable-next-line react-native/no-inline-styles
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                          }}
+                        />
+                      </View>
+                    );
+                  },
+                })}
+                tabBarOptions={{
+                  activeTintColor: colors.primary_information_text_color,
+                  inactiveTintColor: colors.tab_color,
+                  // activeBackgroundColor: '#F1F9ED',
+                  // inactiveBackgroundColor: colors.background_color,
+                  labelStyle: {
+                    fontFamily: 'Montserrat-Medium',
+                  },
+                }}>
+                <Tab.Screen name="Home" component={HomeStackScreen} />
+                <Tab.Screen name="Chat" component={ChatStackScreen} />
+                <Tab.Screen name="Notification" component={Notification} />
+                <Tab.Screen
+                  name="Profile"
+                  component={GeneralProfileStackScreen}
+                />
+                <Tab.Screen name="Proposals" component={ProfileStackScreen} />
+                {/* <Tab.Screen name="Notifications" component={Splash} /> */}
+              </Tab.Navigator>
+            </NavigationContainer>
+            // <View
+            //   style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            // >
+            //   <Button onPress={() => authContext.signOut()}>Sign out</Button>
+            // </View>
+          )}
+        </PaperProvider>
+      </NotificationContext.Provider>
     </AuthContext.Provider>
   );
 }

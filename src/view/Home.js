@@ -9,6 +9,7 @@ import {colors} from '../asset/color';
 import Slider from '../component/Slider';
 import Carousel from '../component/Carousel';
 import {dummyData} from '../data/Data';
+import Auth from '../models/Auth';
 
 const Home = props => {
   return (
@@ -26,7 +27,7 @@ const Home = props => {
               fontSize: 17,
               color: '#fff',
             }}>
-            Good Morning, Chi
+            {`Good Morning, ${Auth.currentUser.name}`}
           </Text>
         </View>
         {/*
@@ -51,7 +52,7 @@ const Home = props => {
                   fontWeight: 'normal',
                   fontFamily: 'Montserrat-Bold',
                 }}>
-                Cac chuc nang
+                Các chức năng
               </Text>
             </View>
 
@@ -91,7 +92,7 @@ const Home = props => {
                 </View>
                 <Text
                   style={{fontFamily: 'Montserrat-Bold', fontWeight: 'normal'}}>
-                  Lop hoc
+                  Lớp học
                 </Text>
               </View>
 
@@ -161,7 +162,7 @@ const Home = props => {
                 </View>
                 <Text
                   style={{fontFamily: 'Montserrat-Bold', fontWeight: 'normal'}}>
-                  Tao yeu cau
+                  Tạo yêu cầu
                 </Text>
               </View>
             </View>

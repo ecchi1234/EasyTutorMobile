@@ -12,23 +12,56 @@ import Auth from '../../models/Auth';
 import Conversation from '../../models/Conversation';
 
 const ListMessage = props => {
-  const currentConversation = React.useMemo(() => new Conversation(), []);
-  currentConversation.id = 11;
+  const [currentConversation, setCurrentConversation] = React.useState(
+    new Conversation(),
+  );
   const [listMessages, setListMessages] = React.useState([]);
-  const [isLoad, setIsLoad] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(true);
   React.useEffect(() => {
-    if (isLoad) {
-      console.log('lan 1: ', listMessages);
-      currentConversation.loadMessages().then(res => {
-        console.log('lan 2: ', listMessages);
-        if (listMessages.length === 0) {
-          setListMessages(res.reverse());
-        }
+    if (!currentConversation.id) {
+      Conversation.find(11).then(con => {
+        setCurrentConversation(con);
       });
-
-      setIsLoad(false);
     }
-  }, [currentConversation, isLoad, listMessages]);
+
+    if (currentConversation.id) {
+      if (isLoading) {
+        currentConversation
+          .loadMessages()
+          .then(res => {
+            console.log('list message: ', res);
+            setListMessages(res);
+          })
+          .finally(() => setIsLoading(false));
+      }
+    }
+  }, [currentConversation, isLoading]);
+
+  const [firstLoad, setFirstLoad] = React.useState(true);
+
+  React.useEffect(() => {
+    if (currentConversation.id && firstLoad) {
+      console.log('chay vo day khong nhi?');
+      currentConversation.onNewMessage(data => {
+        setFirstLoad(false);
+        setIsLoading(true);
+        console.log('tui nhan duoc tin nhan rui: ', Auth.currentUser);
+      });
+    }
+  }, [currentConversation, firstLoad]);
+  // const [isLoad, setIsLoad] = React.useState(true);
+  // React.useEffect(() => {
+  //   if (isLoad) {
+  //     currentConversation.loadMessages().then(res => {
+  //       console.log('lan 2: ', listMessages);
+  //       if (listMessages.length === 0) {
+  //         setListMessages(res.reverse());
+  //       }
+  //     });
+
+  //     setIsLoad(false);
+  //   }
+  // }, [currentConversation, isLoad, listMessages]);
 
   const [ourMessage, setOurMessage] = React.useState('');
 
@@ -75,48 +108,7 @@ const ListMessage = props => {
       </View>
 
       <ScrollView style={{backgroundColor: colors.background_color}}>
-        <View style={{padding: 15}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              marginBottom: 20,
-            }}>
-            <View
-              style={{
-                backgroundColor: '#fff',
-                borderRadius: 10,
-                padding: 10,
-                maxWidth: '70%',
-                minWidth: '10%',
-                elevation: 5,
-              }}>
-              <Text>
-                Hellofffffffffffffffffffffffffffffffffffffffffffffffffff
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              marginBottom: 20,
-            }}>
-            <View
-              style={{
-                backgroundColor: colors.primary_color,
-                borderRadius: 10,
-                padding: 10,
-                maxWidth: '70%',
-                minWidth: '10%',
-              }}>
-              <Text style={{color: '#fff'}}>
-                Hellofffffffffffffffffffffffffffffffffffffffffffffffffff
-              </Text>
-            </View>
-          </View>
-          {console.log('listMessage thuc su ', listMessages)}
+        <View style={{padding: 15, flexDirection: 'column-reverse'}}>
           {listMessages.map((item, index) => {
             if (item.userId === Auth.currentUser.id) {
               return (
@@ -194,12 +186,7 @@ const ListMessage = props => {
                 icon={require('../../asset/send.png')}
                 onPress={() => {
                   setOurMessage('');
-                  currentConversation
-                    .addMessage({content: ourMessage})
-                    .then(res => {
-                      console.log(res);
-                      setIsLoad(true);
-                    });
+                  currentConversation.addMessage({content: ourMessage});
                 }}
                 color={colors.primary_color}
               />

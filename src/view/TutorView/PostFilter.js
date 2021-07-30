@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
+import React, {useState} from 'react';
 
 import {
   View,
@@ -16,8 +16,18 @@ import {Text, Button} from 'react-native-paper';
 
 import {colors} from '../../asset/color';
 
+import Post from '../../models/Post';
+import Subject from '../../models/Subject';
+
+import SelectModal from '../../component/SelectModal';
+
 const PostFilter = props => {
   const [text, onChangeText] = React.useState('');
+  const [visible, setVisible] = useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const [searchInformation, setSearchInformation] = React.useState({});
   return (
     <SafeAreaView style={styles.container}>
       <View
@@ -32,8 +42,14 @@ const PostFilter = props => {
           flexDirection: 'row',
           position: 'relative',
         }}>
+        {/* <SelectModal
+          visible={visible}
+          hideModal={hideModal}
+          listItem={['subject 1', 'subject 2']}
+        /> */}
         <View style={{position: 'absolute', left: 20, bottom: 25}}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => props.navigation.navigate('ListAvailableJob')}>
             <Image
               source={require('../../asset/white-back-button.png')}
               style={{
@@ -47,16 +63,16 @@ const PostFilter = props => {
         </View>
 
         <Text
-          style={{color: '#fff'}}
+          style={{color: '#fff', fontSize: 20}}
           theme={{
             fonts: {
               regular: {
-                fontFamily: 'MontserratBold',
+                fontFamily: 'Montserrat-Bold',
                 fontWeight: 'normal',
               },
             },
           }}>
-          Bo loc
+          Bộ lọc
         </Text>
       </View>
       <ScrollView style={styles.scrollView}>
@@ -74,10 +90,12 @@ const PostFilter = props => {
             }}>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={value =>
+                setSearchInformation({...searchInformation, address: value})
+              }
+              value={searchInformation?.address}
               placeholderTextColor={'#8B8B8B'}
-              placeholder={'Dia chi'}
+              placeholder={'Địa chỉ'}
               borderRadius={10}
               backgroundColor={'#F3F1F1'}
               selectionColor={colors.primary_color}
@@ -93,10 +111,49 @@ const PostFilter = props => {
             }}>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={value =>
+                setSearchInformation({
+                  ...searchInformation,
+                  // eslint-disable-next-line radix
+                  subjects: [parseInt(value, 10)],
+                })
+              }
+              value={
+                searchInformation?.subjects &&
+                searchInformation?.subjects.length > 0
+                  ? searchInformation?.subjects[0].toString()
+                  : ''
+              }
               placeholderTextColor={'#8B8B8B'}
-              placeholder={'Chuyen mon'}
+              placeholder={'Chuyên môn'}
+              borderRadius={10}
+              backgroundColor={'#F3F1F1'}
+              selectionColor={colors.primary_color}
+              onPressIn={() => showModal()}
+            />
+          </View>
+
+          <View
+            style={{
+              width: '100%',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: 30,
+            }}>
+            <TextInput
+              style={styles.input}
+              onChangeText={value =>
+                setSearchInformation({
+                  ...searchInformation,
+                  minOffer: parseInt(value, 10),
+                })
+              }
+              value={
+                searchInformation?.minOffer &&
+                searchInformation?.minOffer.toString()
+              }
+              placeholderTextColor={'#8B8B8B'}
+              placeholder={'Offer nhỏ nhất'}
               borderRadius={10}
               backgroundColor={'#F3F1F1'}
               selectionColor={colors.primary_color}
@@ -111,10 +168,18 @@ const PostFilter = props => {
             }}>
             <TextInput
               style={styles.input}
-              onChangeText={onChangeText}
-              value={text}
+              onChangeText={value =>
+                setSearchInformation({
+                  ...searchInformation,
+                  maxOffer: parseInt(value, 10),
+                })
+              }
+              value={
+                searchInformation?.maxOffer &&
+                searchInformation?.maxOffer.toString()
+              }
               placeholderTextColor={'#8B8B8B'}
-              placeholder={'Offer'}
+              placeholder={'Offer lớn nhất'}
               borderRadius={10}
               backgroundColor={'#F3F1F1'}
               selectionColor={colors.primary_color}
@@ -130,14 +195,28 @@ const PostFilter = props => {
             marginTop: 30,
           }}>
           <Button
-            onPress={() => console.log('pressed')}
+            onPress={() => {
+              Post.withFilter(searchInformation)
+                .get()
+                .then(post => {
+                  console.log('tim kiếm được: ', post);
+                  props.navigation.navigate('ListAvailableJob', {
+                    listFilter: post,
+                  });
+                });
+            }}
             mode={'contained'}
             style={{
               width: '80%',
               borderRadius: 30,
               backgroundColor: colors.primary_color,
+            }}
+            labelStyle={{
+              color: '#FFF',
+              fontFamily: 'Montserrat-Bold',
+              fontWeight: 'normal',
             }}>
-            Tim kiem
+            Tìm kiếm
           </Button>
         </View>
       </ScrollView>
@@ -182,7 +261,7 @@ const styles = StyleSheet.create({
   input: {
     padding: 15,
     width: '85%',
-    fontFamily: 'MontserratMedium',
+    fontFamily: 'Montserrat-Medium',
     fontWeight: 'normal',
   },
 });

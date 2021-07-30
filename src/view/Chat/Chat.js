@@ -10,45 +10,45 @@ import {colors} from '../../asset/color';
 import Conversation from '../../models/Conversation';
 
 const Chat = props => {
-  const [conversation, setConversation] = React.useState(new Conversation());
-  React.useEffect(() => {
-    Conversation.get().then(res => {
-      console.log(res);
-    });
-  }, []);
+  // const [conversation, setConversation] = React.useState(new Conversation());
+  // React.useEffect(() => {
+  //   Conversation.get().then(res => {
+  //     console.log(res);
+  //   });
+  // }, []);
 
-  React.useEffect(() => {
-    if (!conversation.id) {
-      Conversation.find(11).then(con => {
-        console.log('doan hoi thoai dang xet: ', con);
-        setConversation(con);
-      });
-    }
+  // React.useEffect(() => {
+  //   if (!conversation.id) {
+  //     Conversation.find(11).then(con => {
+  //       console.log('doan hoi thoai dang xet: ', con);
+  //       setConversation(con);
+  //     });
+  //   }
 
-    if (conversation.id) {
-      conversation
-        .loadMessages()
-        .then(res => console.log('list tin nhan cua conversation: ', res));
-      conversation.onNewMessage(data =>
-        console.log('tui nhan duoc tin nhan rui: ', data),
-      );
-    }
-  }, [conversation]);
+  //   if (conversation.id) {
+  //     conversation
+  //       .loadMessages()
+  //       .then(res => console.log('list tin nhan cua conversation: ', res));
+  //     conversation.onNewMessage(data =>
+  //       console.log('tui nhan duoc tin nhan rui: ', data),
+  //     );
+  //   }
+  // }, [conversation]);
 
-  const makeNewConversation = React.useCallback(() => {
-    Conversation.create({
-      name: '',
-      users: [101, 102],
-    }).then(res => {
-      console.log('tao thanh cong: ', res);
-    });
-  }, []);
-  // const [newMsg, setNewMsg] = React.useState(false);
-  const addNewCustomMessage = React.useCallback(() => {
-    conversation
-      .addMessage({content: 'lai test tiep ne'})
-      .then(res => console.log('sau khi nhan tin: ', res));
-  }, [conversation]);
+  // const makeNewConversation = React.useCallback(() => {
+  //   Conversation.create({
+  //     name: '',
+  //     users: [101, 102],
+  //   }).then(res => {
+  //     console.log('tao thanh cong: ', res);
+  //   });
+  // }, []);
+  // // const [newMsg, setNewMsg] = React.useState(false);
+  // const addNewCustomMessage = React.useCallback(() => {
+  //   conversation
+  //     .addMessage({content: 'lai test tiep ne'})
+  //     .then(res => console.log('sau khi nhan tin: ', res));
+  // }, [conversation]);
 
   return (
     <>
@@ -498,12 +498,12 @@ const Chat = props => {
               </View>
             </View>
           </View>
-          <Button onPress={() => makeNewConversation()}>
+          {/* <Button onPress={() => makeNewConversation()}>
             Create new conversation
           </Button>
           <Button onPress={() => addNewCustomMessage()}>
             Create new message
-          </Button>
+          </Button> */}
         </View>
       </ScrollView>
     </>
