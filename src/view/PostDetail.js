@@ -9,7 +9,7 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {Text, Title} from 'react-native-paper';
+import {IconButton, Text, Title} from 'react-native-paper';
 import {colors} from '../asset/color';
 
 const PostDetail = props => {
@@ -49,7 +49,7 @@ const PostDetail = props => {
                     },
                   },
                 }}>
-                Dạy toán cho bé
+                {`Yêu cầu dạy #${props?.route?.params?.post?.id}`}
               </Text>
             </View>
           </View>
@@ -62,7 +62,7 @@ const PostDetail = props => {
               paddingTop: 10,
             }}>
             <Text style={{fontSize: 13, textAlign: 'justify'}}>
-              I am looking for a Co-Founder to join me visualize an idea to
+              {/* I am looking for a Co-Founder to join me visualize an idea to
               fruition. The Macro Idea is an Platform BYOB which stands for
               BeYourOwnBoss will be a social media to give a platform to
               entrepreneurs and investors and freelancers enhance the way they
@@ -70,7 +70,10 @@ const PostDetail = props => {
               says "Make it Real". You will need to show only one or two
               examples of your best quality work with proof, so original sketch
               file (screenshots ok) Will need to be turned around quickly, so
-              working over the weekend ay be necessary.
+              working over the weekend ay be necessary. */}
+              {props?.route?.params?.post?.description
+                ? props?.route?.params?.post?.description
+                : 'Không có mô tả'}
             </Text>
             <TouchableOpacity>
               <View
@@ -107,7 +110,7 @@ const PostDetail = props => {
                     },
                   },
                 }}>
-                Thong tin chi tiet
+                Thông tin chi tiết
               </Text>
               <View style={[styles.informationUnderline]} />
             </View>
@@ -125,7 +128,8 @@ const PostDetail = props => {
                         },
                       },
                     }}>
-                    Mon hoc: <Text>Toan hoc</Text>
+                    Môn học:{' '}
+                    <Text>{props?.route?.params?.post?.subject?.name}</Text>
                   </Text>
                 </View>
 
@@ -140,7 +144,8 @@ const PostDetail = props => {
                         },
                       },
                     }}>
-                    Khoi lop: <Text>Cap 1</Text>
+                    Khối lớp:{' '}
+                    <Text>{`Lớp ${props?.route?.params?.post?.grade}`}</Text>
                   </Text>
                 </View>
               </View>
@@ -156,9 +161,9 @@ const PostDetail = props => {
                       },
                     },
                   }}>
-                  Dia chi:{' '}
+                  Địa chỉ:{' '}
                   <Text style={{color: colors.primary_color}}>
-                    144 Xuân Thủy, Cầu Giấy, Hà Nội
+                    {`${props?.route?.params?.post?.address}`}
                   </Text>
                 </Text>
               </View>
@@ -174,7 +179,7 @@ const PostDetail = props => {
                       },
                     },
                   }}>
-                  Hoc phi mot buoi:{' '}
+                  Học phí một buổi:{' '}
                   <Text
                     style={{color: colors.yellow_color}}
                     theme={{
@@ -185,7 +190,7 @@ const PostDetail = props => {
                         },
                       },
                     }}>
-                    160. 000 vnđ
+                    {`${props?.route?.params?.post?.offer} vnđ`}
                   </Text>
                 </Text>
               </View>
@@ -204,9 +209,9 @@ const PostDetail = props => {
                     },
                   },
                 }}>
-                Thong tin nguoi dang
+                Thông tin người đăng
               </Text>
-              <View style={[styles.informationUnderline]}></View>
+              <View style={[styles.informationUnderline]} />
             </View>
 
             <View>
@@ -222,7 +227,7 @@ const PostDetail = props => {
                         },
                       },
                     }}>
-                    Ten: <Text>Nguyen Ngoc Chi</Text>
+                    Tên: <Text>{props?.route?.params?.post?.user?.name}</Text>
                   </Text>
                 </View>
 
@@ -237,7 +242,8 @@ const PostDetail = props => {
                         },
                       },
                     }}>
-                    So dien thoai: <Text>0912358381</Text>
+                    Số điện thoại:{' '}
+                    <Text>{props?.route?.params?.post?.user?.phoneNumber}</Text>
                   </Text>
                 </View>
               </View>
@@ -253,9 +259,9 @@ const PostDetail = props => {
                       },
                     },
                   }}>
-                  Dia chi:{' '}
+                  Địa chỉ:{' '}
                   <Text style={{color: colors.primary_color}}>
-                    144 Xuân Thủy, Cầu Giấy, Hà Nội
+                    {props?.route?.params?.post?.address}
                   </Text>
                 </Text>
               </View>
@@ -273,9 +279,25 @@ const PostDetail = props => {
                     },
                   },
                 }}>
-                Thong ke nguoi ung tuyen
+                Thống kê người ứng tuyển
               </Text>
-              <View style={[styles.informationUnderline]}></View>
+              <View style={[styles.informationUnderline]} />
+              <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <IconButton
+                  icon={'eye'}
+                  size={30}
+                  color={colors.primary_color}
+                  onPress={() =>
+                    props.navigation.navigate('ListTutor', {
+                      applicants: props?.route?.params?.post?.applicants,
+                      post: props?.route?.params?.post,
+                    })
+                  }
+                />
+                <Text style={{color: colors.tab_color}}>
+                  Xem người ứng tuyển
+                </Text>
+              </View>
             </View>
           </View>
           <TouchableOpacity>
@@ -297,7 +319,7 @@ const PostDetail = props => {
                     },
                   },
                 }}>
-                Yeu cau day
+                Yêu cầu dạy
               </Text>
             </View>
           </TouchableOpacity>

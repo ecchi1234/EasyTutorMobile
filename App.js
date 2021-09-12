@@ -263,6 +263,27 @@ export default function App(props) {
           headerShown: false,
         }}
       />
+      <PostStack.Screen
+        name="PostDetail"
+        component={PostDetail}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PostStack.Screen
+        name="ListTutor"
+        component={ListTutor}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <PostStack.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerShown: false,
+        }}
+      />
     </PostStack.Navigator>
   );
 
@@ -437,7 +458,7 @@ export default function App(props) {
                   name="Profile"
                   component={GeneralProfileStackScreen}
                 />
-                <Tab.Screen name="Proposals" component={ProfileStackScreen} />
+                {/* <Tab.Screen name="Proposals" component={ProfileStackScreen} /> */}
                 {/* <Tab.Screen name="Notifications" component={Splash} /> */}
               </Tab.Navigator>
             </NavigationContainer>

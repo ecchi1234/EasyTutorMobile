@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 
-import {View, ScrollView, StatusBar} from 'react-native';
+import {View, ScrollView, StatusBar, Keyboard} from 'react-native';
 
 import {Text, IconButton, Avatar, TextInput} from 'react-native-paper';
 
@@ -10,6 +10,7 @@ import {colors} from '../../asset/color';
 import Auth from '../../models/Auth';
 
 import Conversation from '../../models/Conversation';
+import User from '../../models/User';
 
 const ListMessage = props => {
   const [currentConversation, setCurrentConversation] = React.useState(
@@ -17,16 +18,18 @@ const ListMessage = props => {
   );
   const [listMessages, setListMessages] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [avatar, setAvatar] = React.useState();
   React.useEffect(() => {
     if (!currentConversation.id) {
-      Conversation.find(11).then(con => {
+      console.log(props?.route?.params?.conversation?.id);
+      Conversation.find(props?.route?.params?.conversation?.id).then(con => {
         setCurrentConversation(con);
       });
     }
 
     if (currentConversation.id) {
       if (isLoading) {
-        currentConversation
+        props?.route?.params?.conversation
           .loadMessages()
           .then(res => {
             console.log('list message: ', res);
@@ -35,20 +38,25 @@ const ListMessage = props => {
           .finally(() => setIsLoading(false));
       }
     }
-  }, [currentConversation, isLoading]);
+  }, [
+    currentConversation,
+    isLoading,
+    props?.route?.params?.conversation,
+    props?.route?.params?.conversation?.id,
+  ]);
 
   const [firstLoad, setFirstLoad] = React.useState(true);
 
   React.useEffect(() => {
     if (currentConversation.id && firstLoad) {
       console.log('chay vo day khong nhi?');
-      currentConversation.onNewMessage(data => {
+      props?.route?.params?.conversation.onNewMessage(data => {
         setFirstLoad(false);
         setIsLoading(true);
         console.log('tui nhan duoc tin nhan rui: ', Auth.currentUser);
       });
     }
-  }, [currentConversation, firstLoad]);
+  }, [currentConversation, firstLoad, props?.route?.params?.conversation]);
   // const [isLoad, setIsLoad] = React.useState(true);
   // React.useEffect(() => {
   //   if (isLoad) {
@@ -70,7 +78,6 @@ const ListMessage = props => {
       <View
         style={{
           backgroundColor: colors.primary_color,
-          marginTop: StatusBar.currentHeight,
           height: 75,
           alignItems: 'center',
           flexDirection: 'row',
@@ -97,7 +104,11 @@ const ListMessage = props => {
                 fontWeight: 'normal',
                 color: '#fff',
               }}>
-              Nguyen Thi B
+              {
+                props?.route?.params?.conversation.users.filter(
+                  user => user.id !== Auth.currentUser.id,
+                )[0].name
+              }
             </Text>
           </View>
 
@@ -186,6 +197,7 @@ const ListMessage = props => {
                 icon={require('../../asset/send.png')}
                 onPress={() => {
                   setOurMessage('');
+                  Keyboard.dismiss();
                   currentConversation.addMessage({content: ourMessage});
                 }}
                 color={colors.primary_color}

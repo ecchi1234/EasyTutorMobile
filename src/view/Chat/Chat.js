@@ -6,10 +6,18 @@ import {View, StatusBar, ScrollView, TouchableOpacity} from 'react-native';
 import {Text, Badge, Avatar, Title, Button} from 'react-native-paper';
 
 import {colors} from '../../asset/color';
+import Auth from '../../models/Auth';
 
 import Conversation from '../../models/Conversation';
 
 const Chat = props => {
+  const [listConversation, setListConversation] = React.useState([]);
+  React.useEffect(() => {
+    Conversation.get().then(res => {
+      console.log('list conversation: ', res[0]);
+      setListConversation(res);
+    });
+  }, []);
   // const [conversation, setConversation] = React.useState(new Conversation());
   // React.useEffect(() => {
   //   Conversation.get().then(res => {
@@ -74,429 +82,103 @@ const Chat = props => {
             backgroundColor: colors.background_color,
           }}>
           <View style={{}}>
-            {/** first picture */}
-            <TouchableOpacity
-              onPress={() => props.navigation.navigate('ListMessage')}
-              activeOpacity={1}>
-              <View
-                style={{
-                  backgroundColor: colors.chat_item,
-                  padding: 15,
-                  borderRadius: 15,
-                  elevation: 7,
-                  flexDirection: 'row',
-                  marginBottom: 20,
-                }}>
-                <View style={{position: 'relative'}}>
-                  <Avatar.Image
-                    source={require('../../asset/review-avatar.png')}
-                    size={50}
-                  />
-                  <Badge
-                    style={{
-                      position: 'absolute',
-                      top: 35,
-                      backgroundColor: '#F8C40E',
-                    }}
-                    size={10}
-                  />
-                </View>
-                <View style={{marginLeft: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      width: '76%',
-                      marginBottom: 10,
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 11,
-                          color: colors.primary_information_text_color,
-                          fontFamily: 'Montserrat-Bold',
-                          fontWeight: 'normal',
-                          lineHeight: 11,
-                        }}>
-                        Stephen Strange
-                      </Text>
-                    </View>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          color: colors.tab_color,
-                          lineHeight: 10,
-                        }}>
-                        07:34 PM
-                      </Text>
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      width: '76%',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <View>
-                      <Text
-                        style={{
-                          fontSize: 10,
-                          color: colors.primary_information_text_color,
-                        }}>
-                        You: I had uploaded new files to trello, plea...
-                      </Text>
-                    </View>
-
-                    <View style={{}}>
-                      <Badge
-                        style={{
-                          backgroundColor: '#E15554',
-                        }}
-                        size={25}>
-                        6
-                      </Badge>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </TouchableOpacity>
-
-            {/** second picture */}
-
-            <View
-              style={{
-                backgroundColor: '#fff',
-                padding: 15,
-                borderRadius: 15,
-                elevation: 4,
-                flexDirection: 'row',
-                marginBottom: 20,
-              }}>
-              <View style={{position: 'relative'}}>
-                <Avatar.Image
-                  source={require('../../asset/chat-ava-1.png')}
-                  size={50}
-                />
-                <Badge
-                  style={{
-                    position: 'absolute',
-                    top: 35,
-                    backgroundColor: '#6FDB45',
-                  }}
-                  size={10}
-                />
-              </View>
-              <View style={{marginLeft: 10}}>
+            {listConversation.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() =>
+                  props.navigation.navigate('ListMessage', {
+                    conversation: item,
+                  })
+                }
+                activeOpacity={1}>
                 <View
                   style={{
+                    backgroundColor: '#fff',
+                    padding: 15,
+                    borderRadius: 15,
+                    elevation: 4,
                     flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '76%',
-                    marginBottom: 10,
+                    marginBottom: 20,
                   }}>
-                  <View>
-                    <Text
+                  <View style={{position: 'relative'}}>
+                    <Avatar.Image
+                      source={require('../../asset/chat-ava-1.png')}
+                      size={50}
+                    />
+                    <Badge
                       style={{
-                        fontSize: 11,
-                        color: colors.primary_information_text_color,
-                        fontFamily: 'Montserrat-Bold',
-                        fontWeight: 'normal',
-                        lineHeight: 11,
-                      }}>
-                      Stephen Strange
-                    </Text>
+                        position: 'absolute',
+                        top: 35,
+                        backgroundColor: '#6FDB45',
+                      }}
+                      size={10}
+                    />
                   </View>
-                  <View>
-                    <Text
+                  <View style={{marginLeft: 10}}>
+                    <View
                       style={{
-                        fontSize: 10,
-                        color: colors.tab_color,
-                        lineHeight: 10,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '70%',
+                        marginBottom: 10,
                       }}>
-                      07:34 PM
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: '80%',
-                    flexDirection: 'row',
-                  }}>
-                  <View>
-                    <Text
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 11,
+                            color: colors.primary_information_text_color,
+                            fontFamily: 'Montserrat-Bold',
+                            fontWeight: 'normal',
+                            lineHeight: 11,
+                          }}>
+                          {
+                            item.users.filter(
+                              user => user.id !== Auth.currentUser.id,
+                            )[0].name
+                          }
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: colors.tab_color,
+                            lineHeight: 10,
+                          }}>
+                          recent
+                        </Text>
+                      </View>
+                    </View>
+                    <View
                       style={{
-                        fontSize: 10,
-                        color: colors.primary_information_text_color,
+                        width: '80%',
+                        flexDirection: 'row',
                       }}>
-                      You: I had uploaded new files to trello, plea...
-                    </Text>
-                  </View>
+                      <View>
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            color: colors.primary_information_text_color,
+                          }}>
+                          You: I had uploaded new files to trello, plea...
+                        </Text>
+                      </View>
 
-                  <View style={{}}>
-                    {/* <Badge
+                      <View style={{}}>
+                        {/* <Badge
                       style={{
                         backgroundColor: "#E15554",
                       }}
                     >
                       6
                     </Badge> */}
+                      </View>
+                    </View>
                   </View>
                 </View>
-              </View>
-            </View>
-
+              </TouchableOpacity>
+            ))}
             {/** second picture */}
-
-            <View
-              style={{
-                backgroundColor: '#fff',
-                padding: 15,
-                borderRadius: 15,
-                elevation: 4,
-                flexDirection: 'row',
-                marginBottom: 20,
-              }}>
-              <View style={{position: 'relative'}}>
-                <Avatar.Image
-                  source={require('../../asset/chat-ava-2.png')}
-                  size={50}
-                />
-                <Badge
-                  style={{
-                    position: 'absolute',
-                    top: 35,
-                    backgroundColor: '#6FDB45',
-                  }}
-                  size={10}
-                />
-              </View>
-              <View style={{marginLeft: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '76%',
-                    marginBottom: 10,
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: colors.primary_information_text_color,
-                        fontFamily: 'Montserrat-Bold',
-                        fontWeight: 'normal',
-                        lineHeight: 11,
-                      }}>
-                      Stephen Strange
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.tab_color,
-                        lineHeight: 10,
-                      }}>
-                      07:34 PM
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: '80%',
-                    flexDirection: 'row',
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.primary_information_text_color,
-                      }}>
-                      You: I had uploaded new files to trello, plea...
-                    </Text>
-                  </View>
-
-                  <View style={{}}>
-                    {/* <Badge
-                      style={{
-                        backgroundColor: "#E15554",
-                      }}
-                    >
-                      6
-                    </Badge> */}
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/** second picture */}
-
-            <View
-              style={{
-                backgroundColor: '#fff',
-                padding: 15,
-                borderRadius: 15,
-                elevation: 4,
-                flexDirection: 'row',
-                marginBottom: 20,
-              }}>
-              <View style={{position: 'relative'}}>
-                <Avatar.Image
-                  source={require('../../asset/chat-ava-3.png')}
-                  size={50}
-                />
-                <Badge
-                  style={{
-                    position: 'absolute',
-                    top: 35,
-                    backgroundColor: '#6FDB45',
-                  }}
-                  size={10}
-                />
-              </View>
-              <View style={{marginLeft: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '76%',
-                    marginBottom: 10,
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: colors.primary_information_text_color,
-                        fontFamily: 'Montserrat-Bold',
-                        fontWeight: 'normal',
-                        lineHeight: 11,
-                      }}>
-                      Stephen Strange
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.tab_color,
-                        lineHeight: 10,
-                      }}>
-                      07:34 PM
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: '80%',
-                    flexDirection: 'row',
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.primary_information_text_color,
-                      }}>
-                      You: I had uploaded new files to trello, plea...
-                    </Text>
-                  </View>
-
-                  <View style={{}}>
-                    {/* <Badge
-                      style={{
-                        backgroundColor: "#E15554",
-                      }}
-                    >
-                      6
-                    </Badge> */}
-                  </View>
-                </View>
-              </View>
-            </View>
-
-            {/** second picture */}
-
-            <View
-              style={{
-                backgroundColor: '#fff',
-                padding: 15,
-                borderRadius: 15,
-                elevation: 4,
-                flexDirection: 'row',
-                marginBottom: 20,
-              }}>
-              <View style={{position: 'relative'}}>
-                <Avatar.Image
-                  source={require('../../asset/chat-ava-4.png')}
-                  size={50}
-                />
-                <Badge
-                  style={{
-                    position: 'absolute',
-                    top: 35,
-                    backgroundColor: '#6FDB45',
-                  }}
-                  size={10}
-                />
-              </View>
-              <View style={{marginLeft: 10}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '76%',
-                    marginBottom: 10,
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 11,
-                        color: colors.primary_information_text_color,
-                        fontFamily: 'Montserrat-Bold',
-                        fontWeight: 'normal',
-                        lineHeight: 11,
-                      }}>
-                      Stephen Strange
-                    </Text>
-                  </View>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.tab_color,
-                        lineHeight: 10,
-                      }}>
-                      07:34 PM
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    width: '80%',
-                    flexDirection: 'row',
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.primary_information_text_color,
-                      }}>
-                      You: I had uploaded new files to trello, plea...
-                    </Text>
-                  </View>
-
-                  <View style={{}}>
-                    {/* <Badge
-                      style={{
-                        backgroundColor: "#E15554",
-                      }}
-                    >
-                      6
-                    </Badge> */}
-                  </View>
-                </View>
-              </View>
-            </View>
           </View>
           {/* <Button onPress={() => makeNewConversation()}>
             Create new conversation

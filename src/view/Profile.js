@@ -20,21 +20,30 @@ import {AuthContext} from '../authContext';
 import Auth from '../models/Auth';
 import Rate from '../models/Rate';
 import StarRating from '../component/StarRating';
+import User from '../models/User';
 
 const Profile = props => {
   // const {signOut} = React.useContext(AuthContext);
   const [listRatings, setListRatings] = React.useState([]);
   const [avgRating, setAvgRating] = React.useState();
+  const [userInformation, setUserInformation] = React.useState({});
   React.useEffect(() => {
     Rate.forTutor({id: 101})
       .get()
       .then(rates => {
         setListRatings(rates);
         setAvgRating(rates.avg);
-        console.log(rates.avg);
         // rates.avg: điểm trung bình
         // rates.total: bao nhiêu thằng rate
       });
+  }, []);
+  React.useEffect(() => {
+    User.getTutorInformation(101)
+      .then(res => {
+        console.log(res.data.user);
+        setUserInformation(res.data.user);
+      })
+      .catch(err => console.log(err.response.data));
   }, []);
   const generalInformation = React.useMemo(() => {
     return (
@@ -55,13 +64,16 @@ const Profile = props => {
                   },
                 },
               }}>
-              Gioi thieu ban than
+              Giới thiệu bản thân
             </Text>
             <Text style={{fontSize: 11, color: '#C4C4C4'}}>
-              Hi, My name is Tony Stark! I'm from California, USA. I'm seasoned
+              {userInformation?.profile?.achievementDescription
+                ? userInformation?.profile?.achievementDescription
+                : 'Không có giới thiệu nào'}
+              {/* Hi, My name is Tony Stark! I'm from California, USA. I'm seasoned
               professional with 12+ years of experience web and mobile UI/UX
               design, 4 years of Product Design, 8+ years team management in
-              own, international and California, USA companies.
+              own, international and California, USA companies. */}
             </Text>
             <TouchableOpacity>
               <View
@@ -103,7 +115,7 @@ const Profile = props => {
                   },
                 },
               }}>
-              Thong tin gia su
+              Thông tin gia sư
             </Text>
             <View>
               <View>
@@ -118,7 +130,11 @@ const Profile = props => {
                         },
                       },
                     }}>
-                    Mon hoc: <Text>Toan hoc</Text>
+                    Môn học:{' '}
+                    <Text>
+                      {userInformation?.subjects &&
+                        userInformation?.subjects[0]?.name}
+                    </Text>
                   </Text>
                 </View>
 
@@ -133,7 +149,7 @@ const Profile = props => {
                         },
                       },
                     }}>
-                    Khoi lop: <Text>Cap 1</Text>
+                    Khối lớp: <Text>Lớp 6</Text>
                   </Text>
                 </View>
               </View>
@@ -149,9 +165,9 @@ const Profile = props => {
                       },
                     },
                   }}>
-                  Dia chi:{' '}
+                  Địa chỉ:{' '}
                   <Text style={{color: colors.primary_color}}>
-                    144 Xuân Thủy, Cầu Giấy, Hà Nội
+                    {userInformation?.profile?.address}
                   </Text>
                 </Text>
               </View>
@@ -167,7 +183,7 @@ const Profile = props => {
                       },
                     },
                   }}>
-                  Hoc phi mot buoi:{' '}
+                  Học phí một buổi:{' '}
                   <Text
                     style={{color: colors.yellow_color}}
                     theme={{
@@ -187,7 +203,7 @@ const Profile = props => {
         </View>
       </>
     );
-  }, []);
+  }, [userInformation]);
 
   const reviewInformation = React.useMemo(() => {
     return (
@@ -259,7 +275,7 @@ const Profile = props => {
                             },
                           },
                         }}>
-                        Tran Thi B
+                        {rating?.assessor?.name}
                       </Text>
                       <StarRating star={rating.star} />
                     </View>
@@ -337,7 +353,7 @@ const Profile = props => {
               },
             },
           }}>
-          Ho so gia su
+          Hồ sơ gia sư
         </Text>
       </View>
       <ScrollView style={styles.scrollView}>
@@ -360,7 +376,7 @@ const Profile = props => {
               }}>
               <Avatar.Image
                 size={140}
-                source={require('../asset/avatar.png')}
+                source={{uri: userInformation?.profile?.avatar?.path}}
               />
               <View
                 style={{
@@ -410,7 +426,7 @@ const Profile = props => {
                     },
                   },
                 }}>
-                Danh gia
+                Đánh giá
               </Text>
             </View>
             <Text
@@ -422,7 +438,7 @@ const Profile = props => {
                   },
                 },
               }}>
-              Nguyen Thi B
+              {userInformation?.name}
             </Text>
             <View
               style={{
@@ -445,7 +461,7 @@ const Profile = props => {
                 }}
               />
               <Text style={{color: colors.tab_color, fontSize: 10}}>
-                Kyiv, Ukraine
+                {userInformation?.profile?.address}
               </Text>
             </View>
             <View style={{flexDirection: 'row', marginTop: 10}}>
@@ -482,7 +498,7 @@ const Profile = props => {
                           },
                         },
                       }}>
-                      General
+                      Chung
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -521,7 +537,7 @@ const Profile = props => {
                           },
                         },
                       }}>
-                      Review
+                      Đánh giá
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -530,9 +546,6 @@ const Profile = props => {
           </View>
 
           {informationBlock.information}
-        </View>
-        <View style={{padding: 10}}>
-          <Button onPress={() => Auth.logout()}>Logout</Button>
         </View>
       </ScrollView>
       <View style={{padding: 20, paddingTop: 0}}>
@@ -555,7 +568,7 @@ const Profile = props => {
                   },
                 },
               }}>
-              Moi day
+              Mời dạy
             </Text>
           </View>
         </TouchableOpacity>

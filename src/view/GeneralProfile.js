@@ -13,6 +13,7 @@ import {
 
 import {Text, Avatar} from 'react-native-paper';
 import {colors} from '../asset/color';
+import Auth from '../models/Auth';
 
 const listMenu = [
   {
@@ -41,10 +42,10 @@ const Item = ({item, onPress, backgroundColor, textColor, image}) => (
     <View
       style={{
         flexDirection: 'row',
-        justifyContent: 'space-between',
+
         alignItems: 'center',
       }}>
-      <Image source={image} style={{width: 30, height: 30}} />
+      <Image source={image} style={{width: 30, height: 30, marginRight: 10}} />
       <Text style={[styles.title, textColor]}>{item.title}</Text>
     </View>
   </TouchableOpacity>
@@ -53,8 +54,8 @@ const GeneralProfile = props => {
   const [selectedId, setSelectedId] = React.useState(null);
 
   const renderItem = ({item}) => {
-    const backgroundColor = item.id === selectedId ? '#6e3b6e' : '#f9c2ff';
-    const color = item.id === selectedId ? 'white' : 'black';
+    const backgroundColor = item.id === selectedId ? '#fff' : '#fff';
+    const color = item.id === selectedId ? 'black' : 'black';
 
     return (
       <Item
@@ -83,20 +84,6 @@ const GeneralProfile = props => {
           flexDirection: 'row',
           position: 'relative',
         }}>
-        <View style={{position: 'absolute', left: 20, bottom: 25}}>
-          <TouchableOpacity>
-            <Image
-              source={require('../asset/white-back-button.png')}
-              style={{
-                width: 15,
-                height: 15,
-                marginRight: 6,
-                marginLeft: 5,
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-
         <Text
           style={{color: '#fff'}}
           theme={{
@@ -130,7 +117,12 @@ const GeneralProfile = props => {
               }}>
               <Avatar.Image
                 size={140}
-                source={require('../asset/avatar.png')}
+                source={{
+                  uri: Auth.currentUser.profile.avatar.path.replace(
+                    '127.0.0.1',
+                    '10.0.2.2',
+                  ),
+                }}
               />
             </View>
 
@@ -144,16 +136,17 @@ const GeneralProfile = props => {
                 },
               }}
               style={{fontSize: 17}}>
-              Nguyễn Thị B
+              {Auth.currentUser.name}
             </Text>
             <View
               style={{
                 backgroundColor: '#fff',
                 width: 300,
-                height: 350,
+                height: 300,
                 borderRadius: 10,
                 elevation: 4,
-                marginBottom: 10,
+                marginBottom: 20,
+                marginTop: 10,
               }}>
               <FlatList
                 data={listMenu}
@@ -163,7 +156,7 @@ const GeneralProfile = props => {
               />
             </View>
             <View style={{padding: 20, paddingTop: 0, width: '100%'}}>
-              <TouchableOpacity onPress={() => console.log('bilobilo')}>
+              <TouchableOpacity onPress={() => Auth.logout()}>
                 <View
                   style={{
                     backgroundColor: colors.primary_color,
@@ -200,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   item: {
-    padding: 20,
+    padding: 10,
     marginVertical: 8,
     marginHorizontal: 16,
   },

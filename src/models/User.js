@@ -59,6 +59,9 @@ export default class User extends Model {
   static getUserInformation() {
     return axios.get(this.apiPath + '/profile');
   }
+  static getTutorInformation(id) {
+    return axios.get(this.apiPath + '/profile' + `/${id}`);
+  }
   /**
    *
    * @param {*} updatedInformation {

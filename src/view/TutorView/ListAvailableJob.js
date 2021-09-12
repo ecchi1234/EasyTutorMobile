@@ -19,6 +19,7 @@ import {
   Paragraph,
   Avatar,
   Button,
+  Snackbar,
 } from 'react-native-paper';
 
 import LottieView from 'lottie-react-native';
@@ -27,12 +28,13 @@ import Post from '../../models/Post';
 
 import {logger} from 'react-native-logs';
 import Auth from '../../models/Auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const log = logger.createLogger();
 
 const RightContent = props => {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={props.onPress}>
       <View style={{marginRight: 20}}>
         <Avatar.Icon
           icon={'star'}
@@ -63,6 +65,15 @@ const ListAvailableJob = props => {
   const [posts, setPosts] = React.useState([]);
   const [tmpPost, setTmpPost] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+
+  const [visible, setVisible] = React.useState(false);
+
+  const onToggleSnackBar = React.useCallback(
+    () => setVisible(!visible),
+    [visible],
+  );
+
+  const onDismissSnackBar = () => setVisible(false);
 
   React.useEffect(() => {
     if (!props.route.params) {
@@ -114,6 +125,14 @@ const ListAvailableJob = props => {
       console.log(e);
     }
   };
+
+  const handleSaveToFav = React.useCallback(
+    favourites => {
+      AsyncStorage.setItem('favourites', favourites);
+      onToggleSnackBar();
+    },
+    [onToggleSnackBar],
+  );
 
   const onChangeSearch = query => setSearchQuery(query);
   return (
@@ -184,8 +203,14 @@ const ListAvailableJob = props => {
                     <Card style={{borderRadius: 12}}>
                       <Card.Title
                         title="Hourly - Posted 2 hours ago"
-                        subtitle="Day toan cho be"
-                        right={RightContent}
+                        subtitle={`Yêu cầu dạy #${post.id}`}
+                        right={() => (
+                          <RightContent
+                            onPress={() =>
+                              handleSaveToFav(JSON.stringify(post))
+                            }
+                          />
+                        )}
                         titleStyle={{
                           fontSize: 8,
                           fontFamily: 'Montserrat-SemiBold',
@@ -266,7 +291,12 @@ const ListAvailableJob = props => {
                           }}>
                           {post.description}
                         </Paragraph>
-                        <TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() =>
+                            props.navigation.navigate('PostDetail', {
+                              post: post,
+                            })
+                          }>
                           <View
                             style={{
                               backgroundColor: colors.backgroundColor,
@@ -316,6 +346,17 @@ const ListAvailableJob = props => {
           </View>
         </View>
       </ScrollView>
+      <Snackbar
+        visible={visible}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: 'Undo',
+          onPress: () => {
+            // Do something
+          },
+        }}>
+        Đã lưu vào danh sách yêu thích
+      </Snackbar>
     </SafeAreaView>
   );
 };
